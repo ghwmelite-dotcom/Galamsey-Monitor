@@ -32,6 +32,8 @@ interface MapProps {
   miningSites?: MiningSite[];
   showLegend?: boolean;
   height?: string;
+  center?: [number, number];
+  zoom?: number;
   onLocationSelect?: (lat: number, lng: number) => void;
 }
 
@@ -63,6 +65,8 @@ export default function GhanaMap({
   miningSites = [],
   showLegend = true,
   height = '500px',
+  center = GHANA_CENTER,
+  zoom = 7,
   onLocationSelect,
 }: MapProps) {
   const [isClient, setIsClient] = useState(false);
@@ -111,8 +115,8 @@ export default function GhanaMap({
     <div className="relative">
       <div style={{ height }} className="rounded-xl overflow-hidden shadow-lg">
         <MapContainer
-          center={GHANA_CENTER}
-          zoom={7}
+          center={center}
+          zoom={zoom}
           style={{ height: '100%', width: '100%' }}
           scrollWheelZoom={true}
         >

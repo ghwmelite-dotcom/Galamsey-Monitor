@@ -1,14 +1,15 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getAllMiningSites, createMiningSite } from '@/lib/db';
+import { getAllMiningSites, createMiningSite } from '@/lib/db-d1';
 import type { MiningSiteInput } from '@/types';
 
-export async function GET(request: NextRequest) {
+export const runtime = 'edge';
+
+export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const region = searchParams.get('region');
     const status = searchParams.get('status');
 
-    let sites = getAllMiningSites();
+    let sites = await getAllMiningSites();
 
     if (region) {
       sites = sites.filter(s => s.region === region);
@@ -17,14 +18,14 @@ export async function GET(request: NextRequest) {
       sites = sites.filter(s => s.status === status);
     }
 
-    return NextResponse.json(sites);
+    return Response.json(sites);
   } catch (error) {
     console.error('Error fetching mining sites:', error);
-    return NextResponse.json({ error: 'Failed to fetch mining sites' }, { status: 500 });
+    return Response.json({ error: 'Failed to fetch mining sites' }, { status: 500 });
   }
 }
 
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
   try {
     const body: MiningSiteInput = await request.json();
 
@@ -32,14 +33,14 @@ export async function POST(request: NextRequest) {
     const requiredFields = ['name', 'latitude', 'longitude', 'region', 'district', 'status'];
     for (const field of requiredFields) {
       if (!body[field as keyof MiningSiteInput]) {
-        return NextResponse.json({ error: `Missing required field: ${field}` }, { status: 400 });
+        return Response.json({ error: `Missing required field: ${field}` }, { status: 400 });
       }
     }
 
-    const site = createMiningSite(body);
-    return NextResponse.json(site, { status: 201 });
+    const site = await createMiningSite(body);
+    return Response.json(site, { status: 201 });
   } catch (error) {
     console.error('Error creating mining site:', error);
-    return NextResponse.json({ error: 'Failed to create mining site' }, { status: 500 });
+    return Response.json({ error: 'Failed to create mining site' }, { status: 500 });
   }
 }

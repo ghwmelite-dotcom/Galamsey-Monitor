@@ -1,0 +1,18 @@
+name = "galamsey-monitor"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+# D1 Database binding
+[[d1_databases]]
+binding = "DB"
+database_name = "galamsey-db"
+database_id = "75c89307-ff7e-45c2-b9b5-df7a38fc8977"
+
+# R2 Storage binding
+[[r2_buckets]]
+binding = "STORAGE"
+bucket_name = "galamsey-uploads"
+
+# Environment variables (set via wrangler pages secret)
+# NEXTAUTH_SECRET - Set this via: wrangler pages secret put NEXTAUTH_SECRET
+# NEXTAUTH_URL - Set this via: wrangler pages secret put NEXTAUTH_URL

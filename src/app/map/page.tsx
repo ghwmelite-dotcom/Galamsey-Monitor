@@ -1,13 +1,54 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import Navigation from '@/components/Navigation';
 import GhanaMap from '@/components/GhanaMap';
-import { getAllIncidents, getAllWaterReadings, getAllMiningSites } from '@/lib/db';
-
-export const dynamic = 'force-dynamic';
+import type { Incident, WaterQualityReading, MiningSite } from '@/types';
 
 export default function MapPage() {
-  const incidents = getAllIncidents();
-  const waterReadings = getAllWaterReadings();
-  const miningSites = getAllMiningSites();
+  const [incidents, setIncidents] = useState<Incident[]>([]);
+  const [waterReadings, setWaterReadings] = useState<WaterQualityReading[]>([]);
+  const [miningSites, setMiningSites] = useState<MiningSite[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const [incidentsRes, waterRes, sitesRes] = await Promise.all([
+          fetch('/api/incidents'),
+          fetch('/api/water'),
+          fetch('/api/sites'),
+        ]);
+
+        const [incidentsData, waterData, sitesData] = await Promise.all([
+          incidentsRes.json(),
+          waterRes.json(),
+          sitesRes.json(),
+        ]);
+
+        setIncidents(incidentsData);
+        setWaterReadings(waterData);
+        setMiningSites(sitesData);
+      } catch (error) {
+        console.error('Failed to fetch data:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navigation />
+        <div className="flex items-center justify-center h-[60vh]">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-ghana-green"></div>
+        </div>
+      </div>
+    );
+  }
 
   const activeIncidents = incidents.filter(i => i.status === 'active');
   const pollutedWaters = waterReadings.filter(r => ['polluted', 'hazardous'].includes(r.quality_status));

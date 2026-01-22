@@ -7,7 +7,28 @@
       "Bash(npm run build:*)",
       "Bash(timeout 20 npm run dev:*)",
       "Bash(git init:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nInitial release: Galamsey Monitor Platform\n\nA comprehensive web platform for monitoring and combating illegal\nsmall-scale mining \\(galamsey\\) in Ghana.\n\nFeatures:\n- Dashboard with real-time statistics and interactive map\n- Incident reporting system with GPS geolocation support\n- Water quality monitoring for Ghana''s rivers\n- Data visualization with charts and analytics\n- Satellite imagery integration \\(Sentinel Hub, Google Earth\\)\n- Education and awareness resources\n- RESTful API for all data operations\n\nTech Stack:\n- Next.js 16 with App Router\n- TypeScript for type safety\n- Tailwind CSS v4 for styling\n- SQLite database with better-sqlite3\n- Leaflet for interactive maps\n- Recharts for data visualization\n\nCovers all 16 regions of Ghana with sample data for\nAshanti, Western, Eastern, and Central regions.\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git branch:*)",
+      "Bash(git remote add:*)",
+      "Bash(git push:*)",
+      "Bash(gh repo edit:*)",
+      "Bash(gh repo view:*)",
+      "Bash(npm run db:migrate:*)",
+      "Bash(npm run dev)",
+      "Bash(tasklist:*)",
+      "Bash(findstr:*)",
+      "Bash(netstat:*)",
+      "Bash(timeout:*)",
+      "Bash(npm view:*)",
+      "Bash(npx wrangler login)",
+      "Bash(npx wrangler:*)",
+      "Bash(npm run db:push:*)",
+      "Bash(npm run build:next:*)",
+      "Bash(node:*)",
+      "Bash(wsl:*)",
+      "Bash(npx.cmd vercel:*)",
+      "Bash(dir:*)"
     ]
   }
 }

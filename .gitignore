@@ -46,3 +46,8 @@ coverage/
 # Misc
 *.log
 *.tmp
+nul
+
+# Cloudflare/Vercel
+.wrangler/
+.vercel/

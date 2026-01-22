@@ -1,16 +1,60 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import Navigation from '@/components/Navigation';
 import DashboardStats from '@/components/DashboardStats';
 import RecentIncidents from '@/components/RecentIncidents';
 import GhanaMap from '@/components/GhanaMap';
-import { getDashboardStats, getAllIncidents, getAllWaterReadings, getAllMiningSites } from '@/lib/db';
-
-export const dynamic = 'force-dynamic';
+import type { DashboardStats as DashboardStatsType, Incident, WaterQualityReading, MiningSite } from '@/types';
 
 export default function Home() {
-  const stats = getDashboardStats();
-  const incidents = getAllIncidents();
-  const waterReadings = getAllWaterReadings();
-  const miningSites = getAllMiningSites();
+  const [stats, setStats] = useState<DashboardStatsType | null>(null);
+  const [incidents, setIncidents] = useState<Incident[]>([]);
+  const [waterReadings, setWaterReadings] = useState<WaterQualityReading[]>([]);
+  const [miningSites, setMiningSites] = useState<MiningSite[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const [statsRes, incidentsRes, waterRes, sitesRes] = await Promise.all([
+          fetch('/api/stats'),
+          fetch('/api/incidents'),
+          fetch('/api/water'),
+          fetch('/api/sites'),
+        ]);
+
+        const [statsData, incidentsData, waterData, sitesData] = await Promise.all([
+          statsRes.json(),
+          incidentsRes.json(),
+          waterRes.json(),
+          sitesRes.json(),
+        ]);
+
+        setStats(statsData);
+        setIncidents(incidentsData);
+        setWaterReadings(waterData);
+        setMiningSites(sitesData);
+      } catch (error) {
+        console.error('Failed to fetch data:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navigation />
+        <div className="flex items-center justify-center h-[60vh]">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-ghana-green"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -29,7 +73,7 @@ export default function Home() {
         </div>
 
         {/* Alert Banner */}
-        {stats.activeIncidents > 0 && (
+        {stats && stats.activeIncidents > 0 && (
           <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-r-lg">
             <div className="flex items-center">
               <div className="flex-shrink-0">
@@ -48,7 +92,7 @@ export default function Home() {
         )}
 
         {/* Stats Cards */}
-        <DashboardStats stats={stats} />
+        {stats && <DashboardStats stats={stats} />}
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
@@ -67,7 +111,7 @@ export default function Home() {
 
           {/* Recent Incidents */}
           <div className="lg:col-span-1">
-            <RecentIncidents incidents={stats.recentIncidents} />
+            {stats && <RecentIncidents incidents={stats.recentIncidents} />}
           </div>
         </div>
 

@@ -1,9 +1,10 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import Navigation from '@/components/Navigation';
 import GhanaMap from '@/components/GhanaMap';
-import { getAllWaterReadings } from '@/lib/db';
 import { Droplets, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
-
-export const dynamic = 'force-dynamic';
+import type { WaterQualityReading } from '@/types';
 
 const statusConfig = {
   safe: { color: 'bg-blue-100 text-blue-800', icon: CheckCircle, label: 'Safe' },
@@ -13,7 +14,35 @@ const statusConfig = {
 };
 
 export default function WaterPage() {
-  const waterReadings = getAllWaterReadings();
+  const [waterReadings, setWaterReadings] = useState<WaterQualityReading[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const res = await fetch('/api/water');
+        const data = await res.json();
+        setWaterReadings(data);
+      } catch (error) {
+        console.error('Failed to fetch water readings:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navigation />
+        <div className="flex items-center justify-center h-[60vh]">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+      </div>
+    );
+  }
 
   const stats = {
     safe: waterReadings.filter(r => r.quality_status === 'safe').length,

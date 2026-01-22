@@ -21,6 +21,26 @@ const config: Config = {
           polluted: '#EF4444',
         },
       },
+      keyframes: {
+        'fade-in': {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+        'zoom-in-95': {
+          '0%': { opacity: '0', transform: 'scale(0.95)' },
+          '100%': { opacity: '1', transform: 'scale(1)' },
+        },
+        'slide-up': {
+          '0%': { opacity: '0', transform: 'translateY(10px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+      },
+      animation: {
+        'fade-in': 'fade-in 0.2s ease-out',
+        'zoom-in-95': 'zoom-in-95 0.2s ease-out',
+        'slide-up': 'slide-up 0.2s ease-out',
+        'modal': 'zoom-in-95 0.2s ease-out',
+      },
     },
   },
   plugins: [],
