@@ -21,6 +21,7 @@ import {
   Search,
   MoreHorizontal,
   Settings,
+  Trophy,
 } from 'lucide-react';
 import AuthModal from './AuthModal';
 
@@ -33,6 +34,7 @@ const primaryNavItems = [
 
 // Secondary nav items (in "More" dropdown)
 const secondaryNavItems = [
+  { href: '/impact', label: 'My Impact', icon: Trophy },
   { href: '/water', label: 'Water Quality', icon: Droplets },
   { href: '/statistics', label: 'Statistics', icon: BarChart3 },
   { href: '/satellite', label: 'Satellite', icon: Satellite },

@@ -359,3 +359,324 @@ export interface PaginatedResponse<T> {
   limit: number;
   totalPages: number;
 }
+
+// ============================================
+// Guardian System Types (Phase 2)
+// ============================================
+
+export type GuardianRank = 'observer' | 'bronze' | 'silver' | 'gold' | 'diamond';
+
+export interface GuardianProfile {
+  id: number;
+  user_id: number;
+  display_name: string;
+  guardian_rank: GuardianRank;
+  guardian_points: number;
+  reports_submitted: number;
+  reports_verified: number;
+  enforcement_actions: number;
+  badges: Badge[];
+  bio?: string;
+  avatar_url?: string;
+  region?: string;
+  show_on_leaderboard: boolean;
+  created_at: string;
+}
+
+export interface Badge {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  points: number;
+  earned_at?: string;
+}
+
+export interface UserBadge {
+  id: number;
+  user_id: number;
+  badge_id: string;
+  badge_name: string;
+  badge_description?: string;
+  badge_icon?: string;
+  earned_at: string;
+}
+
+export type ActivityType =
+  | 'report_submitted'
+  | 'report_verified'
+  | 'report_rejected'
+  | 'enforcement_triggered'
+  | 'badge_earned'
+  | 'rank_promoted'
+  | 'comment_added'
+  | 'evidence_uploaded'
+  | 'alert_subscription';
+
+export interface UserActivity {
+  id: number;
+  user_id: number;
+  activity_type: ActivityType;
+  incident_id?: number;
+  points_earned: number;
+  metadata?: string;
+  created_at: string;
+}
+
+export interface LeaderboardEntry {
+  rank: number;
+  user_id: number;
+  display_name: string;
+  avatar_url?: string;
+  guardian_rank: GuardianRank;
+  score: number;
+  region?: string;
+}
+
+export interface Leaderboard {
+  period: 'weekly' | 'monthly' | 'all_time';
+  category: 'reports' | 'verified' | 'enforcement' | 'points';
+  region?: string;
+  entries: LeaderboardEntry[];
+  updated_at: string;
+}
+
+// Guardian rank requirements
+export const GUARDIAN_RANK_REQUIREMENTS = {
+  observer: { min_verified: 0, min_points: 0 },
+  bronze: { min_verified: 5, min_points: 50 },
+  silver: { min_verified: 20, min_points: 200 },
+  gold: { min_verified: 50, min_points: 500 },
+  diamond: { min_verified: 100, min_points: 1000 },
+} as const;
+
+// ============================================
+// Outcome Tracking Types (Phase 2)
+// ============================================
+
+export type OutcomeType =
+  | 'investigation_opened'
+  | 'site_visit_conducted'
+  | 'warning_issued'
+  | 'equipment_seized'
+  | 'site_closed'
+  | 'arrests_made'
+  | 'remediation_started'
+  | 'remediation_completed'
+  | 'case_dismissed';
+
+export interface IncidentOutcome {
+  id: number;
+  incident_id: number;
+  outcome_type: OutcomeType;
+  outcome_date: string;
+  description?: string;
+  evidence_url?: string;
+  reported_by?: number;
+  verified: boolean;
+  verified_by?: number;
+  verified_at?: string;
+  impact_score: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface IncidentOutcomeInput {
+  incident_id: number;
+  outcome_type: OutcomeType;
+  outcome_date: string;
+  description?: string;
+  evidence_url?: string;
+  reported_by?: number;
+}
+
+export const OUTCOME_WEIGHTS: Record<OutcomeType, number> = {
+  investigation_opened: 1.0,
+  site_visit_conducted: 2.0,
+  warning_issued: 2.5,
+  equipment_seized: 4.0,
+  site_closed: 5.0,
+  arrests_made: 5.0,
+  remediation_started: 6.0,
+  remediation_completed: 8.0,
+  case_dismissed: 0,
+};
+
+export type RecoveryLocationType = 'water_body' | 'land' | 'forest';
+
+export interface EnvironmentalRecovery {
+  id: number;
+  incident_id?: number;
+  location_type: RecoveryLocationType;
+  location_name: string;
+  latitude?: number;
+  longitude?: number;
+  baseline_date: string;
+  baseline_status: string;
+  current_status?: string;
+  recovery_percentage: number;
+  last_assessment_date?: string;
+  next_assessment_date?: string;
+  notes?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+// ============================================
+// Impact Dashboard Types (Phase 2)
+// ============================================
+
+export interface UserImpact {
+  user_id: number;
+  display_name: string;
+  guardian_rank: GuardianRank;
+  guardian_points: number;
+
+  // Report stats
+  reports_submitted: number;
+  reports_verified: number;
+  reports_pending: number;
+  reports_rejected: number;
+
+  // Outcome stats
+  enforcement_actions: number;
+  sites_closed: number;
+  equipment_seized: number;
+  arrests_made: number;
+
+  // Environmental impact
+  estimated_hectares_protected: number;
+  water_bodies_monitored: number;
+
+  // Badges
+  badges: Badge[];
+  recent_badges: Badge[];
+
+  // Activity
+  recent_activities: UserActivity[];
+  activity_streak: number;
+
+  // Rankings
+  global_rank?: number;
+  regional_rank?: number;
+}
+
+export interface PlatformImpact {
+  total_reports: number;
+  verified_reports: number;
+  active_incidents: number;
+  resolved_incidents: number;
+
+  total_enforcement_actions: number;
+  sites_closed: number;
+  equipment_seized: number;
+  arrests_made: number;
+
+  estimated_hectares_protected: number;
+  water_bodies_monitored: number;
+  recovery_projects: number;
+
+  active_guardians: number;
+  total_guardians: number;
+  reports_this_month: number;
+
+  regions_covered: number;
+  districts_covered: number;
+}
+
+// ============================================
+// Public API Types (Phase 2)
+// ============================================
+
+export type ApiTier = 'free' | 'standard' | 'professional' | 'enterprise';
+export type ApiPermission = 'read' | 'write' | 'admin';
+
+export interface ApiKey {
+  id: number;
+  user_id?: number;
+  key_prefix: string;
+  name: string;
+  tier: ApiTier;
+  rate_limit_daily: number;
+  rate_limit_minute: number;
+  permissions: ApiPermission[];
+  allowed_origins?: string[];
+  last_used_at?: string;
+  requests_today: number;
+  requests_total: number;
+  is_active: boolean;
+  expires_at?: string;
+  created_at: string;
+}
+
+export interface ApiKeyInput {
+  name: string;
+  tier?: ApiTier;
+  permissions?: ApiPermission[];
+  allowed_origins?: string[];
+  expires_at?: string;
+}
+
+export const API_TIER_LIMITS = {
+  free: { daily: 100, minute: 10 },
+  standard: { daily: 10000, minute: 100 },
+  professional: { daily: 100000, minute: 1000 },
+  enterprise: { daily: -1, minute: -1 }, // Unlimited
+} as const;
+
+export interface ApiRequest {
+  id: number;
+  api_key_id?: number;
+  endpoint: string;
+  method: string;
+  status_code?: number;
+  response_time_ms?: number;
+  ip_address?: string;
+  user_agent?: string;
+  created_at: string;
+}
+
+// ============================================
+// Webhook Types (Phase 2)
+// ============================================
+
+export type WebhookEvent =
+  | 'incident.created'
+  | 'incident.verified'
+  | 'incident.resolved'
+  | 'incident.updated'
+  | 'water_quality.alert'
+  | 'enforcement.action'
+  | 'outcome.reported';
+
+export interface Webhook {
+  id: number;
+  user_id?: number;
+  url: string;
+  events: WebhookEvent[];
+  is_active: boolean;
+  last_triggered_at?: string;
+  failure_count: number;
+  created_at: string;
+}
+
+export interface WebhookInput {
+  url: string;
+  events: WebhookEvent[];
+}
+
+export interface WebhookDelivery {
+  id: number;
+  webhook_id: number;
+  event_type: WebhookEvent;
+  payload: string;
+  status_code?: number;
+  response_body?: string;
+  delivered_at: string;
+}
+
+export interface WebhookPayload {
+  event: WebhookEvent;
+  timestamp: string;
+  data: Record<string, unknown>;
+}
